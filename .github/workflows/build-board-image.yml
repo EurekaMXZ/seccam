@@ -1,0 +1,45 @@
+name: Build Board Image
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-board-image.yml"
+      - "docker/board-image-builder.Dockerfile"
+      - "scripts/**"
+      - "packaging/**"
+      - "core/**"
+      - "backend/**"
+      - "cmake/**"
+      - "CMakeLists.txt"
+      - "assets/models/**"
+
+jobs:
+  build-board-image:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Builder Image
+        run: docker build -f docker/board-image-builder.Dockerfile -t seccam-board-builder docker
+
+      - name: Build Duo256M Board Image
+        run: |
+          docker run --rm --privileged \
+            -v "${GITHUB_WORKSPACE}:/workspace" \
+            -w /workspace \
+            seccam-board-builder \
+            ./scripts/build_board_image.sh
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: seccam-duo256m-board-image
+          path: |
+            out/*.img
+            out/*.img.zip
+            out/*.sha256
+          if-no-files-found: error

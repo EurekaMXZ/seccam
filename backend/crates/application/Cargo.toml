@@ -1,0 +1,12 @@
+[package]
+name = "seccam-application"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+async-trait.workspace = true
+seccam-domain = { path = "../domain" }
+seccam-ipc = { path = "../ipc" }
+thiserror.workspace = true
+tokio.workspace = true

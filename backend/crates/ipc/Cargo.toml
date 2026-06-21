@@ -1,0 +1,13 @@
+[package]
+name = "seccam-ipc"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+async-trait.workspace = true
+seccam-domain = { path = "../domain" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["io-util"] }

@@ -1,0 +1,26 @@
+# Build outputs
+/build/
+/out/
+/backend/target/
+
+# Downloaded SDKs and toolchains
+/host_tools/*
+!/host_tools/.gitkeep
+
+# Local agent and tooling state
+/.agents/
+/.codex/
+
+# Logs and runtime artifacts
+*.log
+*.pid
+*.sqlite3
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/

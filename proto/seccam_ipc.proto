@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package seccam.ipc.v1;
+
+message IpcEnvelope {
+  uint64 request_id = 1;
+  oneof payload {
+    StatusRequest status_request = 10;
+    StatusReply status_reply = 11;
+    ConfigRequest config_request = 12;
+    ConfigReply config_reply = 13;
+    EventMessage event_message = 15;
+    RecordingListRequest recording_list_request = 16;
+    RecordingListReply recording_list_reply = 17;
+    EventListRequest event_list_request = 21;
+    EventListReply event_list_reply = 22;
+    ErrorReply error_reply = 20;
+  }
+}
+
+message StatusRequest {}
+
+message StatusReply {
+  CoreStatus status = 1;
+}
+
+message ConfigRequest {
+  oneof action {
+    GetConfig get = 1;
+    SetConfig set = 2;
+  }
+}
+
+message GetConfig {}
+
+message SetConfig {
+  RuntimeConfig config = 1;
+}
+
+message ConfigReply {
+  RuntimeConfig current = 1;
+  bool applied = 2;
+}
+
+message EventListRequest {
+  uint32 limit = 1;
+}
+
+message EventListReply {
+  repeated EventMessage events = 1;
+}
+
+message RecordingListRequest {
+  uint32 limit = 1;
+  uint64 newer_than_ms = 2;
+}
+
+message RecordingListReply {
+  repeated RecordingFile files = 1;
+}
+
+message ErrorReply {
+  uint32 code = 1;
+  string message = 2;
+}
+
+message CoreStatus {
+  bool media_ready = 1;
+  bool inference_ready = 2;
+  bool recording = 3;
+  string model_name = 4;
+  uint32 stream_width = 5;
+  uint32 stream_height = 6;
+  uint32 detect_width = 7;
+  uint32 detect_height = 8;
+  uint32 detection_fps = 9;
+  uint32 encode_fps = 10;
+  uint64 last_detection_ms = 11;
+  uint64 last_recording_start_ms = 12;
+  repeated DetectionObject current_objects = 13;
+}
+
+message RuntimeConfig {
+  string model_name = 1;
+  string model_path = 2;
+  string record_dir = 3;
+  string sensor_config_path = 4;
+  string rtsp_stream_name = 5;
+  float threshold = 6;
+  uint32 trigger_hits = 7;
+  uint32 clear_misses = 8;
+  uint32 hold_seconds = 9;
+  uint32 min_record_seconds = 10;
+  uint32 stream_width = 11;
+  uint32 stream_height = 12;
+  uint32 detect_width = 13;
+  uint32 detect_height = 14;
+  uint32 tdl_vb_width = 15;
+  uint32 tdl_vb_height = 16;
+  uint32 bitrate_kbps = 17;
+  uint32 rtsp_port = 18;
+  uint64 max_record_bytes = 19;
+  uint64 max_segment_bytes = 20;
+  uint64 prebuffer_bytes = 21;
+  int32 person_class_id = 22;
+  bool draw_text = 23;
+}
+
+message DetectionObject {
+  string label = 1;
+  float score = 2;
+  float x1 = 3;
+  float y1 = 4;
+  float x2 = 5;
+  float y2 = 6;
+}
+
+message RecordingFile {
+  string path = 1;
+  uint64 size = 2;
+  uint64 started_ms = 3;
+  uint64 ended_ms = 4;
+}
+
+message EventMessage {
+  EventType type = 1;
+  uint64 happened_ms = 2;
+  string summary = 3;
+  oneof detail {
+    DetectionEvent detection = 10;
+    RecordingEvent recording = 11;
+    FaultEvent fault = 12;
+  }
+}
+
+message DetectionEvent {
+  bool present = 1;
+  repeated DetectionObject objects = 2;
+}
+
+message RecordingEvent {
+  string file_path = 1;
+  bool active = 2;
+}
+
+message FaultEvent {
+  string component = 1;
+  string message = 2;
+}
+
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  EVENT_TYPE_DETECTION = 1;
+  EVENT_TYPE_RECORDING = 2;
+  EVENT_TYPE_FAULT = 3;
+}

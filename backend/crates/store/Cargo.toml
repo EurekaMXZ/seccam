@@ -1,0 +1,12 @@
+[package]
+name = "seccam-store"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+async-trait.workspace = true
+rusqlite = { version = "0.32", features = ["bundled"] }
+seccam-domain = { path = "../domain" }
+thiserror.workspace = true
+tokio.workspace = true
